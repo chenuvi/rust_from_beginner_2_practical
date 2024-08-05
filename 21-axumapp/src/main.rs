@@ -1,10 +1,11 @@
 use axum::{
     extract::Query,
     response::{Html, IntoResponse},
-    routing::get,
-    Form, Router,
+    routing::{get, post},
+    Form, Json, Router,
 };
 use serde::Deserialize;
+use serde_json::json;
 use tower_http::{
     services::{ServeDir, ServeFile},
     trace::TraceLayer,
@@ -27,6 +28,8 @@ async fn main() {
         .route("/", get(handler))
         .route("/query", get(query))
         .route("/form", get(show_form).post(accept_form))
+        .route("/json", post(accept_json))
+        .route("/resjson", post(res_json))
         .nest_service("/assets2", ServeDir::new("assets2/test.html"))
         .nest_service("/assets3", ServeDir::new("assets3"))
         .fallback_service(serve_dir)
@@ -86,4 +89,16 @@ struct Input {
 async fn accept_form(Form(input): Form<Input>) -> Html<&'static str> {
     tracing::debug!("form input {:?}", input);
     Html("<h3>Form posted</h3>")
+}
+async fn accept_json(Json(input): Json<Input>) -> Html<&'static str> {
+    tracing::debug!("json params {:?}", input);
+    Html("<h3>Json posted x1</h3>")
+}
+
+async fn res_json(Json(input): Json<Input>) -> impl IntoResponse {
+    tracing::debug!("json params {:?}", input);
+    Json(json!({
+        "result": "ok",
+        "number": 1,
+    }))
 }
