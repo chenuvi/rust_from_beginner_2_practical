@@ -3,7 +3,7 @@ use axum::{
     Router,
 };
 mod handlers;
-use handlers::{accept_form, accept_json, handler, handler_404, query, res_json, show_form};
+use handlers::{accept_form, accept_json, greet, handler, handler_404, query, res_json, show_form};
 use tower_http::{services::ServeDir, trace::TraceLayer};
 
 #[tokio::main]
@@ -17,6 +17,7 @@ async fn main() {
         .route("/form", get(show_form).post(accept_form))
         .route("/json", post(accept_json))
         .route("/resjson", post(res_json))
+        .route("/greet/:name", get(greet))
         .nest_service("/assets2", ServeDir::new("assets2/test.html"))
         .nest_service("/assets3", ServeDir::new("assets3"))
         .layer(TraceLayer::new_for_http())

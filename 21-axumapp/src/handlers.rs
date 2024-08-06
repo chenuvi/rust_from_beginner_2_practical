@@ -1,3 +1,5 @@
+use askama::Template;
+use axum::extract::Path;
 use axum::{
     extract::Query,
     http::StatusCode,
@@ -70,6 +72,15 @@ pub async fn res_json(Json(input): Json<Input>) -> impl IntoResponse {
         "result": "ok",
         "number": 1,
     }))
+}
+
+#[derive(Template)]
+#[template(path = "hello.html")]
+pub struct HelloTemplate {
+    name: String,
+}
+pub async fn greet(Path(name): Path<String>) -> impl IntoResponse {
+    HelloTemplate { name }.to_string()
 }
 
 pub async fn handler_404() -> impl IntoResponse {
