@@ -1,0 +1,18 @@
+[package]
+name = "axumapp"
+version = "0.3.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+askama = "0.12.1"
+axum = "0.7.5"
+bb8 = "0.8.5"
+bb8-postgres = "0.8.1"
+serde = { version =  "1.0.204", features = ["derive"] }
+serde_json = "1.0.122"
+tokio = { version =  "1.39.2",features = ["full"]  }
+tokio-postgres = "0.7.11"
+tower-http = { version = "0.5.2", features = ["fs", "trace"] }
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
