@@ -28,6 +28,7 @@ async fn main() {
         .route("/todos", get(todos_index))
         .route("/todo/new", post(todo_create))
         .route("/todo/update", post(update_todo))
+        .route("/todo/delete/:id", post(delete_todo))
         .layer(TraceLayer::new_for_http())
         .fallback(handler_404)
         .with_state(pool);
@@ -130,6 +131,19 @@ async fn update_todo(
             "update todo set description=$1, completed=$2 where id=$3",
             &[&description, &completed, &id],
         )
+        .await
+        .map_err(internal_error)?;
+
+    Ok((StatusCode::OK, Json(id)))
+}
+
+async fn delete_todo(
+    Path(id): Path<String>,
+    State(pool): State<ConnectionPool>,
+) -> Result<(StatusCode, Json<String>), (StatusCode, String)> {
+    let conn = pool.get().await.map_err(internal_error)?;
+    let _ret = conn
+        .execute("delete from todo where id=$1", &[&id])
         .await
         .map_err(internal_error)?;
 
